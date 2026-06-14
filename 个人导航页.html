@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XX的个人导航</title>
+    <title>YSL的个人导航</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -623,6 +623,163 @@
             .btn { padding: 8px 16px; font-size: 13px; }
             .site-card { padding: 14px 10px; }
         }
+
+        /* ========== 双页翻页系统 ========== */
+        #pageContainer {
+            position: fixed;
+            inset: 0;
+            perspective: 1400px;
+            perspective-origin: center center;
+            z-index: 1;
+        }
+        .page {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            backface-visibility: hidden;
+            transition: transform 0.9s cubic-bezier(0.6, 0, 0.3, 1), opacity 0.9s ease;
+        }
+        .page-1 {
+            z-index: 2;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .page-2 {
+            z-index: 1;
+            transform: rotateY(180deg) scale(0.92);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .page-container-flipped .page-1 {
+            transform: rotateY(-180deg) scale(0.92);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .page-container-flipped .page-2 {
+            transform: rotateY(0deg) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 第二页分类区块 */
+        .bk-section {
+            margin-bottom: 28px;
+        }
+        .bk-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding-left: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bk-section-title .badge {
+            font-size: 11px;
+            background: rgba(99,102,241,0.2);
+            color: #a5b4fc;
+            padding: 1px 10px;
+            border-radius: 999px;
+        }
+        .bk-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            will-change: transform;
+        }
+        .bk-card:hover {
+            background: var(--card-hover);
+            border-color: rgba(255,255,255,0.25);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+        }
+        .bk-card:active { transform: scale(0.97); }
+        .bk-card .bk-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+        .bk-card .bk-icon-fallback {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .bk-card .bk-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        /* 翻页导航指示器 */
+        .page-indicator {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .page-indicator:hover {
+            background: rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .page-indicator .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            transition: all 0.3s ease;
+        }
+        .page-indicator .dot.active {
+            background: #818cf8;
+            box-shadow: 0 0 8px rgba(99,102,241,0.5);
+            width: 20px;
+            border-radius: 3px;
+        }
+        .page-indicator .label {
+            font-size: 11px;
+            margin-left: 4px;
+        }
     </style>
 </head>
 <body>
@@ -631,7 +788,10 @@
     <div class="bg-overlay"></div>
     <div class="toast-container" id="toastContainer"></div>
 
-    <div class="container mx-auto px-4 py-8 max-w-6xl" style="position:relative;z-index:1;">
+    <div id="pageContainer">
+        <!-- ==================== 第一页 ==================== -->
+        <div class="page page-1" id="page1">
+            <div class="container mx-auto px-4 py-8 max-w-6xl" style="position:relative;z-index:1;">
 
         <!-- ==================== 头部 ==================== -->
         <header class="mb-8 text-center animate-fade-in">
@@ -717,6 +877,28 @@
                 <button id="emptyAddBtn" class="btn btn-primary">添加第一个网站</button>
             </div>
         </main>
+            </div>
+        </div>
+
+        <!-- ==================== 第二页 ==================== -->
+        <div class="page page-2" id="page2">
+            <div class="container mx-auto px-4 py-8 max-w-6xl" style="position:relative;z-index:1;">
+                <div class="text-center mb-6 animate-fade-in">
+                    <h1 class="text-[clamp(1.5rem,4vw,2.6rem)] font-extrabold title-gradient mb-1 tracking-tight">
+                        <i class="fa-regular fa-bookmark mr-2"></i>我的收藏夹
+                    </h1>
+                    <p class="text-xs opacity-40">基于浏览器书签自动生成  ·  点击卡片直接打开</p>
+                </div>
+                <div id="bookmarksContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 翻页指示器 -->
+    <div class="page-indicator" id="pageIndicator">
+        <span class="dot active"></span>
+        <span class="label">1/2</span>
+        <span class="dot"></span>
     </div>
 
     <!-- ==================== 添加/编辑网站模态框 ==================== -->
@@ -869,6 +1051,7 @@
             'https://prod-streaming-video.msn.cn/9c5d905e-ff07-45d9-a3c0-324841e6a4e8/93f3480b-e705-4152-8f8b-a5ce248fdd6a.mp4'
         ];
         const EDGE_STATIC = [
+            { url: 'bg.jpg', label: '默认 · bg' },
             { url: 'https://img-s.msn.cn/tenant/amp/entityid/BB1msIHB?w=0&h=0&q=60&m=6&f=jpg&u=t', label: 'Edge · 原野' },
             { url: 'https://img-s.msn.cn/tenant/amp/entityid/BB1msMpz?w=0&h=0&q=60&m=6&f=jpg&u=t', label: 'Edge · 湖光' }
         ];
@@ -933,20 +1116,18 @@
                 websites = JSON.parse(savedWebsites);
             } else {
                 websites = [
-                    { id: Date.now() + 1,  name: 'FoFa', url: 'https://fofa.info/', category: 'web工具', icon: 'https://fofa.info/favicon.ico' },
-                    { id: Date.now() + 2,  name: 'Shodan', url: 'https://www.shodan.io/', category: 'web工具', icon: 'https://www.shodan.io/static/img/favicon-60c1b1cd.png' },
-                    { id: Date.now() + 3,  name: 'Butian', url: 'https://www.butian.net/', category: '学习平台', icon: 'https://www.butian.net/favicon.ico' },
-                    { id: Date.now() + 4,  name: 'GitHub', url: 'https://github.com', category: '开发工具', icon: 'https://github.githubassets.com/assets/mona-loading-default-c3c7aad1282f.gif' },
-                    { id: Date.now() + 5,  name: '豆包', url: 'https://doubao.com', category: 'AI', icon: 'https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao/chat/static/image/logo-icon-white-bg.72df0b1a.png' },
-                    { id: Date.now() + 6, name: 'DeepSeek', url: 'https://chat.deepseek.com/', category: 'AI', icon: 'https://fe-static.deepseek.com/chat/favicon.svg' },
-                    { id: Date.now() + 7, name: 'DeepSeekAPI', url: 'https://platform.deepseek.com/usage', category: 'AI', icon: 'https://fe-static.deepseek.com/platform/favicon.svg' },
-                    { id: Date.now() + 8, name: 'ChatGPT', url: 'https://chatgpt.com', category: 'AI', icon: 'https://cdn.oaistatic.com/assets/favicon-l4nq08hd.svg' },
-                    { id: Date.now() + 9, name: '华为ICT', url: 'https://talent.shixizhi.huawei.com/course/1365189427395223554/application-view?courseId=1952650863094407169&appId=1952659689185095681&status=published&appType=5&classId=1952659442710429697&headershow=undefined&sxz-lang=zh_CN', category: '学习平台', icon: 'https://r-h2.huaweistatic.com/s/hwtalent/lst/huawei.png' },
-                    { id: Date.now() + 10, name: '华为人才在线', url: 'https://e.huawei.com/cn/talent/portal/', category: '学习平台', icon: 'https://r-h2.huaweistatic.com/s/hwtalent/lst/huawei.png' },
-                    { id: Date.now() + 11 name: '抖音', url: 'https://www.douyin.com', category: '视频娱乐', icon: 'https://p-pc-weboff.byteimg.com/tos-cn-i-9r5gewecjs/favicon.png' },
-                    { id: Date.now() + 12, name: '哔哩哔哩', url: 'https://www.bilibili.com', category: '视频娱乐', icon: 'https://www.bilibili.com/favicon.ico' },
-                    { id: Date.now() + 13, name: '稀土掘金', url: 'https://juejin.cn', category: '技术社区', icon: 'https://lf-web-assets.juejin.cn/obj/juejin-web/xitu_juejin_web/6c61ae65d1c41ae8221a670fa32d05aa.svg' },
-                    { id: Date.now() + 14, name: 'FontAwesome', url: 'https://fontawesome.com/icons', category: '图标', icon: 'https://fontawesome.com/favicon.ico' }
+                    { id: Date.now() + 1,  name: '豆包', url: 'https://doubao.com', category: 'AI', icon: 'https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/doubao/chat/static/image/logo-icon-white-bg.72df0b1a.png' },
+                    { id: Date.now() + 2, name: 'DeepSeek', url: 'https://chat.deepseek.com/', category: 'AI', icon: 'https://fe-static.deepseek.com/chat/favicon.svg' },
+                    { id: Date.now() + 3, name: 'DeepSeekAPI', url: 'https://platform.deepseek.com/usage', category: 'AI', icon: 'https://fe-static.deepseek.com/platform/favicon.svg' },
+                    { id: Date.now() + 4, name: 'MiMo', url: 'https://platform.xiaomimimo.com/console/usage', category: 'AI', icon: 'https://platform.xiaomimimo.com/static/favicon.874c9507.png' },
+                    { id: Date.now() + 5, name: 'ChatGPT', url: 'https://chatgpt.com', category: 'AI', icon: 'https://cdn.oaistatic.com/assets/favicon-l4nq08hd.svg' },
+                    { id: Date.now() + 6, name: '华为ICT', url: 'https://talent.shixizhi.huawei.com/course/1365189427395223554/application-view?courseId=1952650863094407169&appId=1952659689185095681&status=published&appType=5&classId=1952659442710429697&headershow=undefined&sxz-lang=zh_CN', category: '学习平台', icon: 'https://r-h2.huaweistatic.com/s/hwtalent/lst/huawei.png' },
+                    { id: Date.now() + 7, name: '华为人才在线', url: 'https://e.huawei.com/cn/talent/portal/', category: '学习平台', icon: 'https://r-h2.huaweistatic.com/s/hwtalent/lst/huawei.png' },
+                    { id: Date.now() + 8, name: '抖音', url: 'https://www.douyin.com', category: '视频娱乐', icon: 'https://p-pc-weboff.byteimg.com/tos-cn-i-9r5gewecjs/favicon.png' },
+                    { id: Date.now() + 9, name: '学习通', url: 'https://i.chaoxing.com/base?t=1762238715128', category: '学习平台', icon: 'https://ts1.tc.mm.bing.net/th/id/OIP-C.wvaCkPpGrjF3sNwswO-iRgAAAA?w=108&h=108&c=1&bgcl=2795f2&r=0&o=7&dpr=1.3&pid=ImgRC&rm=3' },
+                    { id: Date.now() + 10, name: '哔哩哔哩', url: 'https://www.bilibili.com', category: '视频娱乐', icon: 'https://www.bilibili.com/favicon.ico' },
+                    { id: Date.now() + 11, name: '稀土掘金', url: 'https://juejin.cn', category: '技术社区', icon: 'https://lf-web-assets.juejin.cn/obj/juejin-web/xitu_juejin_web/6c61ae65d1c41ae8221a670fa32d05aa.svg' },
+                    { id: Date.now() + 12, name: 'FontAwesome', url: 'https://fontawesome.com/icons', category: '图标', icon: 'https://fontawesome.com/favicon.ico' }
                 ];
                 saveData();
             }
@@ -1019,8 +1200,15 @@
                 document.body.style.backgroundImage = '';
                 bgVideo.src = url;
                 bgVideo.style.display = 'block';
-                bgVideo.play().catch(() => {});
+                bgVideo.loop = true;
+                const playPromise = bgVideo.play();
+                if (playPromise) playPromise.catch(() => {});
+                // 防停：ended/stalled时重试播放
+                bgVideo.onended = () => { bgVideo.play().catch(() => {}); };
+                bgVideo.onstalled = () => { bgVideo.play().catch(() => {}); };
             } else {
+                bgVideo.onended = null;
+                bgVideo.onstalled = null;
                 bgVideo.style.display = 'none';
                 bgVideo.pause();
                 bgVideo.src = '';
@@ -1328,7 +1516,7 @@
                 return;
             }
             const video = document.createElement('video');
-            video.crossOrigin = 'anonymous';
+            if (/^https?:\/\//i.test(url)) video.crossOrigin = 'anonymous';
             video.preload = 'metadata';
             video.muted = true;
             video.playsInline = true;
@@ -1518,12 +1706,14 @@
                 }
             }
 
-            // 如果当前背景是本地默认图也放在前面提示
-            if (currentBgUrl && (currentBgUrl === DEFAULT_BG.url || currentBgUrl.endsWith('bg.jpg'))) {
+            // 如果当前背景是本地默认图/视频也放在前面提示
+            if (currentBgUrl && (currentBgUrl === DEFAULT_BG.url || currentBgUrl.endsWith('bg.jpg') || currentBgUrl.endsWith('.mp4'))) {
+                const videoThumb = isVideoUrl(currentBgUrl);
                 const currentWp = {
-                    thumb: DEFAULT_BG.url,
-                    full: DEFAULT_BG.url,
-                    label: '当前使用 · 默认'
+                    thumb: videoThumb ? 'bg.jpg' : currentBgUrl,
+                    full: currentBgUrl,
+                    label: '当前使用 · 默认',
+                    isVideo: videoThumb
                 };
                 wallpapers = [currentWp, ...wallpapers];
             }
@@ -1545,6 +1735,14 @@
                 };
                 img.src = wp.thumb;
 
+                // 视频项加播放图标
+                if (wp.isVideo) {
+                    const playIcon = document.createElement('i');
+                    playIcon.className = 'fa-solid fa-play';
+                    playIcon.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;opacity:0.5;z-index:2;pointer-events:none;';
+                    div.appendChild(playIcon);
+                }
+
                 // 标签
                 const label = document.createElement('span');
                 label.className = 'wallpaper-label';
@@ -1563,11 +1761,20 @@
             });
 
             // 默认壁纸（保底，排最后）
-            const isDefaultAlreadyShown = currentBgUrl && (currentBgUrl === DEFAULT_BG.url || currentBgUrl.endsWith('bg.jpg'));
+            const isDefaultAlreadyShown = currentBgUrl && (currentBgUrl === DEFAULT_BG.url || currentBgUrl.endsWith('bg.jpg') || currentBgUrl.endsWith('.mp4'));
             if (!isDefaultAlreadyShown) {
                 const defaultDiv = document.createElement('div');
                 defaultDiv.className = 'wallpaper-option is-default';
-                defaultDiv.style.backgroundImage = `url('${DEFAULT_BG.url}')`;
+                if (isVideoUrl(DEFAULT_BG.url)) {
+                    // 视频默认用bg.jpg做缩略图
+                    defaultDiv.style.backgroundImage = `url('bg.jpg')`;
+                    const playIcon = document.createElement('i');
+                    playIcon.className = 'fa-solid fa-play';
+                    playIcon.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;opacity:0.5;z-index:2;pointer-events:none;';
+                    defaultDiv.appendChild(playIcon);
+                } else {
+                    defaultDiv.style.backgroundImage = `url('${DEFAULT_BG.url}')`;
+                }
                 defaultDiv.title = DEFAULT_BG.label;
                 const defaultLabel = document.createElement('span');
                 defaultLabel.className = 'wallpaper-label';
@@ -1813,11 +2020,19 @@
 
             // 网络搜索
             const doSearch = () => {
-                const query = $('#webSearchInput').value.trim();
+                let query = $('#webSearchInput').value.trim();
                 if (!query) return;
                 const engine = currentEngineValue;
 
+                // 完整URL直接打开
                 if (/^https?:\/\//i.test(query)) {
+                    window.open(query, '_blank');
+                    return;
+                }
+
+                // 含"."且无空格 -> 自动识别为网址
+                if (/\./.test(query) && !/\s/.test(query) && /\.[a-z]{2,}(\/|$)/i.test(query)) {
+                    query = 'https://' + query;
                     window.open(query, '_blank');
                     return;
                 }
@@ -1901,7 +2116,170 @@
                     closeChangeBgModal();
                     contextMenu.classList.add('hidden');
                 }
+                // 翻页键盘快捷键
+                if ((e.key === 'PageDown' || (e.key === 'ArrowDown' && !e.ctrlKey && !e.metaKey)) && currentPage === 1) {
+                    e.preventDefault();
+                    flipToPage(2);
+                }
+                if ((e.key === 'PageUp' || (e.key === 'ArrowUp' && !e.ctrlKey && !e.metaKey)) && currentPage === 2) {
+                    e.preventDefault();
+                    flipToPage(1);
+                }
             });
+        }
+
+        // ==================== 第二页书签数据 ====================
+        const BOOKMARK_CATEGORIES = [
+            { id: 'ai', icon: 'fa-brain', name: 'AI工具', items: [
+                ['讯飞星火', 'https://xinghuo.xfyun.cn/'],
+                ['ChatGPT', 'https://chatgpt.com/', 'https://cdn.oaistatic.com/assets/favicon-l4nq08hd.svg'],
+                ['DeepSeek', 'https://chat.deepseek.com/', 'https://fe-static.deepseek.com/chat/favicon.svg'],
+                ['Manus', 'https://manus.im/app'],
+                ['LMArena', 'https://lmarena.ai/zh'],
+                ['PixVerse', 'https://app.pixverse.ai/home', 'https://cdn.pixverseai.cn/media/pixverse/favicon.png'],
+                ['可灵AI', 'https://klingai.kuaishou.com/image-to-video/new'],
+                ['即梦AI', 'https://jimeng.jianying.com/ai-tool/home', 'https://lf3-lv-buz.vlabstatic.com/obj/image-lvweb-buz/common/images/dreamina-v5.ico'],
+                ['Lumiere AI', 'https://www.lumi-ai.org/'],
+                ['清言PPT', 'https://chatglm.cn/main/gdetail/670e3c3e119b48fe5a851149?lang=zh'],
+                ['TextToSpeech', 'https://www.text-to-speech.cn/', 'https://www.text-to-speech.cn/img/speech.png'],
+                ['小米MiMo', 'https://platform.xiaomimimo.com/console/api-keys', 'https://platform.xiaomimimo.com/static/favicon.874c9507.png'],
+                ['Runway', 'https://app.runwayml.com/login'],
+                ['Stable Video', 'https://stability.ai/stable-video'],
+                ['Pika', 'https://pika.art/try']
+            ]},
+            { id: 'range', icon: 'fa-bullseye', name: '渗透靶场', items: [
+                ['OverTheWire', 'https://overthewire.org/wargames/bandit/'],
+                ['Bugku密码字典', 'https://www.bugku.com/mima/']
+            ]},
+            { id: 'src', icon: 'fa-shield-halved', name: 'SRC安全', items: [
+                ['补天平台', 'https://www.butian.net/'],
+                ['DNSLOG(dnslog)', 'http://www.dnslog.cn/'],
+                ['DNSLOG(dig.pm)', 'https://dig.pm/'],
+                ['VulBox', 'https://www.vulbox.com/'],
+                ['FreeBuf', 'https://www.freebuf.com/'],
+                ['安全客', 'https://www.anquanke.com/'],
+                ['先知社区', 'https://xz.aliyun.com/news'],
+                ['VirusTotal', 'https://www.virustotal.com/gui/home/upload']
+            ]},
+            { id: 'asset', icon: 'fa-binoculars', name: '资产测绘', items: [
+                ['FOFA', 'https://fofa.info/'],
+                ['Shodan', 'https://www.shodan.io/', 'https://www.shodan.io/static/img/favicon-60c1b1cd.png'],
+                ['鹰图Hunter', 'https://hunter.qianxin.com/'],
+                ['ZoomEye', 'https://www.zoomeye.org/'],
+                ['360Quake', 'https://quake.360.net/quake/#/index'],
+                ['微步X情报', 'https://x.threatbook.com/'],
+                ['腾讯TIX', 'https://tix.qq.com/'],
+                ['深信服TI', 'https://ti.sangfor.com.cn/analysis-platform'],
+                ['ICP备案', 'https://beiancx.miit.gov.cn/#/Integrated/index'],
+                ['IP查询(cip)', 'https://cip.cc/'],
+                ['爱企查', 'https://aiqicha.baidu.com/'],
+                ['天眼查', 'https://top.tianyancha.com/'],
+                ['商机宝', 'https://shangjibao.baidu.com/', 'https://fe-aff.cdn.bcebos.com/biz-crm-fe-toker/online/favicon.ico'],
+                ['T00ls', 'https://www.t00ls.com/']
+            ]},
+            { id: 'tools', icon: 'fa-screwdriver-wrench', name: '开发者工具', items: [
+                ['GitHub', 'https://github.com'],
+                ['Docker Hub', 'https://hub.docker.com/'],
+                ['阿里云ACR', 'https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors'],
+                ['阿里云权益', 'https://www.aliyun.com/benefit', 'https://img.alicdn.com/tfs/TB1_ZXuNcfpK1RjSZFOXXa6nFXa-32-32.ico'],
+                ['FontAwesome', 'https://fontawesome.com/search'],
+                ['Flaticon', 'https://www.flaticon.com/'],
+                ['Linux命令大全', 'https://www.linuxcool.com/'],
+                ['即时工具', 'https://www.67tool.com/'],
+                ['程序员导航', 'https://hao.panziye.com/'],
+                ['爱达杂货铺', 'https://adzhp.cc/'],
+                ['方达极客', 'https://gitclone.com/'],
+                ['华为ICT', 'https://e.huawei.com/cn/talent/outPage/#/sxz-course/home'],
+                ['NAS网盘', 'http://nas.whhlwa.cn:5244/'],
+                ['网课笔记', 'http://note.whhlwa.cn:8181/', 'http://note.whhlwa.cn:8181/favicon.ico'],
+                ['Crx搜搜', 'https://www.crxsoso.com/search']
+            ]},
+            { id: 'game', icon: 'fa-gamepad', name: '游戏娱乐', items: [
+                ['歪玩游戏', 'https://www.wygamer.com/'],
+                ['B站', 'https://www.bilibili.com/'],
+                ['CurseForge(MC)', 'https://www.curseforge.com/minecraft/search'],
+                ['OpenFrp', 'https://console.openfrp.net/manage-proxies'],
+                ['MuseScore', 'https://musescore.com/'],
+                ['nanoMIDI', 'https://nanomidi.net/'],
+                ['abcnotation', 'https://abcnotation.com/']
+            ]},
+            { id: 'study', icon: 'fa-graduation-cap', name: '学习平台', items: [
+                ['智慧树', 'https://onlineweb.zhihuishu.com/'],
+                ['洛谷', 'https://www.luogu.com.cn/'],
+                ['LeetCode', 'https://leetcode.cn/'],
+                ['CSDN', 'https://www.csdn.net/'],
+                ['w3school', 'https://www.w3school.com.cn/'],
+                ['科技竞赛', 'https://2025.jsjds.com.cn/'],
+                ['马士兵教育', 'https://www.mashibing.com/'],
+                ['PPT下载', 'https://www.1ppt.com/xiazai/'],
+                ['百度', 'https://www.baidu.com/'],
+                ['系统总裁', 'http://www.sysceo.com/']
+            ]}
+        ];
+
+        // ==================== 翻页系统 ====================
+        let currentPage = 1;
+        let isFlipping = false;
+
+        function renderBookmarks() {
+            const container = $('#bookmarksContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            BOOKMARK_CATEGORIES.forEach((cat, ci) => {
+                const section = document.createElement('div');
+                section.className = 'bk-section animate-fade-in';
+                section.style.animationDelay = (ci * 0.08) + 's';
+                section.innerHTML = '<div class="bk-section-title"><i class="fa-solid ' + cat.icon + '" style="color:#818cf8;font-size:14px;"></i> ' + cat.name + ' <span class="badge">' + cat.items.length + '</span></div>';
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5';
+                cat.items.forEach(item => {
+                    const name = item[0], url = item[1], customIcon = item[2];
+                    const card = document.createElement('div');
+                    card.className = 'bk-card';
+                    // 小图标 + 文字兜底
+                    const icon = document.createElement('img');
+                    icon.className = 'bk-icon';
+                    icon.src = customIcon || ('https://' + (() => { try { return new URL(url).hostname; } catch(e) { return ''; } })() + '/favicon.ico');
+                    icon.loading = 'lazy';
+                    icon.onerror = function() {
+                        this.style.display = 'none';
+                        const fb = document.createElement('span');
+                        fb.className = 'bk-icon-fallback';
+                        const colors = ['#6366f1','#06b6d4','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#ef4444','#3b82f6'];
+                        fb.style.background = colors[name.charCodeAt(0) % colors.length];
+                        fb.textContent = name.charAt(0).toUpperCase();
+                        this.parentNode.insertBefore(fb, this.nextSibling);
+                    };
+                    card.appendChild(icon);
+                    const label = document.createElement('span');
+                    label.className = 'bk-name';
+                    label.textContent = name;
+                    card.appendChild(label);
+                    card.addEventListener('click', () => window.open(url, '_blank'));
+                    grid.appendChild(card);
+                });
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+        }
+
+        function flipToPage(page) {
+            if (isFlipping || page === currentPage) return;
+            isFlipping = true;
+            currentPage = page;
+            const container = $('#pageContainer');
+            const indicator = $('#pageIndicator');
+            if (page === 2) {
+                container.classList.add('page-container-flipped');
+            } else {
+                container.classList.remove('page-container-flipped');
+            }
+            // 更新指示器
+            const dots = indicator.querySelectorAll('.dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === (page - 1)));
+            const label = indicator.querySelector('.label');
+            if (label) label.textContent = page + '/2';
+            setTimeout(() => { isFlipping = false; }, 900);
         }
 
         // ==================== 自动全屏 ====================
@@ -1932,11 +2310,47 @@
 
             // 尝试进入全屏
             enterFullscreen();
+
+            // 背景视频保活：每5秒检查一次，意外暂停就恢复
+            setInterval(() => {
+                const v = $('#bgVideo');
+                if (v && v.style.display !== 'none' && v.paused && v.src) {
+                    v.play().catch(() => {});
+                }
+            }, 5000);
+
+            // 渲染书签
+            renderBookmarks();
+
+            // 翻页滚轮监听
+            let wheelTimeout = null;
+            document.addEventListener('wheel', (e) => {
+                if (wheelTimeout) return;
+                // 只监听页面空白区域滚轮，不干扰网格内滚动
+                const target = e.target;
+                const isScrollable = target.closest && (target.closest('.page-1') || target.closest('.page-2'));
+                if (!isScrollable) return;
+                // 检测当前页面是否已滚到底/顶
+                const activePage = currentPage === 1 ? $('#page1') : $('#page2');
+                const scrollTop = activePage.scrollTop;
+                const maxScroll = activePage.scrollHeight - activePage.clientHeight;
+
+                if (e.deltaY > 0 && currentPage === 1 && scrollTop >= maxScroll - 5) {
+                    wheelTimeout = true;
+                    flipToPage(2);
+                    setTimeout(() => { wheelTimeout = false; }, 1000);
+                } else if (e.deltaY < 0 && currentPage === 2 && scrollTop <= 5) {
+                    wheelTimeout = true;
+                    flipToPage(1);
+                    setTimeout(() => { wheelTimeout = false; }, 1000);
+                }
+            }, { passive: true });
+
+            // 指示器点击切换
+            $('#pageIndicator').addEventListener('click', () => {
+                flipToPage(currentPage === 1 ? 2 : 1);
+            });
         }
-		window.onload(){
-			// 尝试进入全屏
-			enterFullscreen();
-		}
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
